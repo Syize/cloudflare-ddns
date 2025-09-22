@@ -69,7 +69,7 @@ if __name__ == "__main__":
         "type": "A",
         "name": dns_record,
         "content": ip_address,
-        "ttl": 3600,
+        "ttl": 60,
         "proxied": False,
         "comment": "",
     }
