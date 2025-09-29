@@ -6,7 +6,7 @@ from requests import get, put
 
 if __name__ == "__main__":
     zone = "syize.cn"
-    dns_record = "ssh.syize.cn"
+    dns_record_list = ["ssh.syize.cn"]
 
     envs = os.environ
 
@@ -58,21 +58,22 @@ if __name__ == "__main__":
     res = get(request_url, headers=headers, proxies=proxies)
     zone_id = res.json()["result"][0]["id"]
 
-    # get dns record id
-    request_url = f"https://api.cloudflare.com/client/v4/zones/{zone_id}/dns_records?type=A&name={dns_record}"
-    res = get(request_url, headers=headers, proxies=proxies)
-    dns_record_id = res.json()["result"][0]["id"]
+    for _record in dns_record_list:
+        # get dns record id
+        request_url = f"https://api.cloudflare.com/client/v4/zones/{zone_id}/dns_records?type=A&name={_record}"
+        res = get(request_url, headers=headers, proxies=proxies)
+        dns_record_id = res.json()["result"][0]["id"]
 
-    # update the dns record
-    request_url = f"https://api.cloudflare.com/client/v4/zones/{zone_id}/dns_records/{dns_record_id}"
-    data = {
-        "type": "A",
-        "name": dns_record,
-        "content": ip_address,
-        "ttl": 60,
-        "proxied": False,
-        "comment": "",
-    }
-    res = put(request_url, headers=headers, proxies=proxies, json=data)
-    success_status = res.json()["success"]
-    print(f"[INFO] Success: {success_status}")
+        # update the dns record
+        request_url = f"https://api.cloudflare.com/client/v4/zones/{zone_id}/dns_records/{dns_record_id}"
+        data = {
+            "type": "A",
+            "name": _record,
+            "content": ip_address,
+            "ttl": 60,
+            "proxied": False,
+            "comment": "",
+        }
+        res = put(request_url, headers=headers, proxies=proxies, json=data)
+        success_status = res.json()["success"]
+        print(f"[INFO] {_record}: {success_status}")
